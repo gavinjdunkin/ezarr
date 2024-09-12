@@ -229,14 +229,14 @@ services:
   # system monitoring
   prometheus:
     image: prom/prometheus:latest
-    conatiner_name: prometheus
+    container_name: prometheus
     environment:
       - PUID=${PROMETHEUS_UID}
-      - PUID=${PROMETHEUS_GID}
+      - PUID=${MEDIACENTER_GID}
       - TZ=${TIMEZONE}
       - UMASK=002
     volumes:
-      - ${ROOT_DIR}/config/prometheus:/prometheus
+      - ${ROOT_DIR}/config/prometheus-config:/prometheus
     ports:
       - 9090:9090
     restart: unless-stopped
@@ -247,7 +247,7 @@ services:
     network_mode: host
     environment:
       - PUID=${NODE_UID}
-      - PGID=${NODE_GID}
+      - PGID=${MEDIACENTER_GID}
       - TZ=${TIMEZONE}
       - UMASK=002
     volumes:
@@ -256,24 +256,24 @@ services:
       - 9191:9090
     restart: unless-stopped
 
-    grafana:
-      image: grafana/grafana:latest
-      container_name: grafana
-      environment:
-        - PUID=${GRAFANA_UID}
-        - PGID=${GRAFANA_GID}
-        - TZ=${TIMEZONE}
-        - UMASK=002
-      ports:
-        - 3000:3000
-      restart: unless-stopped
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    environment:
+      - PUID=${GRAFANA_UID}
+      - PGID=${MEDIACENTER_GID}
+      - TZ=${TIMEZONE}
+      - UMASK=002
+    ports:
+      - 3000:3000
+    restart: unless-stopped
     
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
     environment:
       - PUID=${HOMEPAGE_UID}
-      - PGID=${HOMEPAGE_GID}
+      - PGID=${MEDIACENTER_GID}
       - TZ=${TIMEZONE}
       - UMASK=002
     ports:

@@ -25,6 +25,7 @@ sudo useradd node -u $NODE_UID
 sudo useradd bazarr -u $BAZARR_UID
 sudo useradd audiobookshelf -u $AUDIOBOOKSHELF_UID
 sudo useradd grafana -u $GRAFANA_UID
+sudo useradd homepage -u $HOMEPAGE_UID
 sudo groupadd mediacenter -g $MEDIACENTER_GID
 
 # Adds current user to the mediacenter group. This is recommended so that you can still have access to files inside the ezarr folder structure for manual control.
@@ -49,11 +50,12 @@ sudo usermod -a -G mediacenter node
 sudo usermod -a -G mediacenter bazarr
 sudo usermod -a -G mediacenter audiobookshelf
 sudo usermod -a -G mediacenter grafana
+sudo usermod -a -G mediacenter homepage
 
 # Make directories
 # ${ROOT_DIR:-.}/ means take the value from ROOT_DIR value, if failed or empty place it in the current folder
-sudo mkdir -pv ${ROOT_DIR:-.}/config/{sonarr,radarr,lidarr,readarr,prometheus,prowlarr,qbittorrent,jackett,audiobookshelf,overseerr,plex,node,tautulli,sabnzbd,bazarr,grafana}-config
-sudo mkdir -pv ${ROOT_DIR:-.}/data/{torrents,usenet,media}/{tv,movies,music,books,audiobooks,podcasts,audiobookshelf-metadata}
+# sudo mkdir -pv ${ROOT_DIR:-.}/config/{sonarr,radarr,lidarr,readarr,prometheus,prowlarr,qbittorrent,jackett,audiobookshelf,overseerr,plex,node,tautulli,sabnzbd,bazarr,grafana,homepage}-config
+# sudo mkdir -pv ${ROOT_DIR:-.}/data/{torrents,usenet,media}/{tv,movies,music,books,audiobooks,podcasts,audiobookshelf-metadata}
 
 # Set permissions
 sudo chmod -R 775 ${ROOT_DIR:-.}/data/
@@ -69,7 +71,8 @@ sudo chown -R qbittorrent:mediacenter ${ROOT_DIR:-.}/config/qbittorrent-config
 sudo chown -R jackett:mediacenter ${ROOT_DIR:-.}/config/jackett-config
 sudo chown -R overseerr:mediacenter ${ROOT_DIR:-.}/config/overseerr-config
 sudo chown -R plex:mediacenter ${ROOT_DIR:-.}/config/plex-config
-sudo chown -R $UID:mediacenter ${ROOT_DIR:-.}/config/jellyfin-config
+sudo chown -R prometheus:mediacenter ${ROOT_DIR:-.}/config/prometheus-config
+sudo chown -R homepage:mediacenter ${ROOT_DIR:-.}/config/homepage-config
 sudo chown -R $UID:mediacenter ${ROOT_DIR:-.}/config/tautulli-config
 sudo chown -R sabnzbd:mediacenter ${ROOT_DIR:-.}/config/sabnzbd-config
 sudo chown -R bazarr:mediacenter ${ROOT_DIR:-.}/config/bazarr-config
