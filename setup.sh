@@ -54,8 +54,8 @@ sudo usermod -a -G mediacenter homepage
 
 # Make directories
 # ${ROOT_DIR:-.}/ means take the value from ROOT_DIR value, if failed or empty place it in the current folder
-# sudo mkdir -pv ${ROOT_DIR:-.}/config/{sonarr,radarr,lidarr,readarr,prometheus,prowlarr,qbittorrent,jackett,audiobookshelf,overseerr,plex,node,tautulli,sabnzbd,bazarr,grafana,homepage}-config
-# sudo mkdir -pv ${ROOT_DIR:-.}/data/{torrents,usenet,media}/{tv,movies,music,books,audiobooks,podcasts,audiobookshelf-metadata}
+sudo mkdir -pv ${ROOT_DIR:-.}/config/{sonarr,radarr,lidarr,readarr,prometheus,prowlarr,qbittorrent,jackett,audiobookshelf,overseerr,plex,node,tautulli,sabnzbd,bazarr,grafana,homepage}-config
+sudo mkdir -pv ${ROOT_DIR:-.}/data/{torrents,usenet,media}/{tv,movies,music,books,audiobooks,podcasts,audiobookshelf-metadata}
 
 # Set permissions
 sudo chmod -R 775 ${ROOT_DIR:-.}/data/
