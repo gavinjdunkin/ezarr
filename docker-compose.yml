@@ -1,4 +1,5 @@
----
+version: '3.8'  # Add this version header if you're using Docker Compose v2
+
 name: ezarr
 services:
   sonarr:
@@ -117,7 +118,7 @@ services:
     ports:
       - "9696:9696"
     restart: unless-stopped
-  
+
   jackett:
     image: lscr.io/linuxserver/jackett:latest
     container_name: jackett
@@ -161,9 +162,6 @@ services:
   tautulli:
     image: lscr.io/linuxserver/tautulli:latest
     container_name: tautulli
-    # commented out because plex can also run outside of docker
-    #depends_on: 
-    #  - plex
     environment:
       - PUID=${UID}
       - PGID=${MEDIACENTER_GID}
@@ -177,6 +175,7 @@ services:
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
+    network_mode: "service:gluetun"
     environment:
       - PUID=${QBITTORRENT_UID}
       - PGID=${MEDIACENTER_GID}
@@ -186,10 +185,6 @@ services:
     volumes:
       - ${ROOT_DIR}/config/qbittorrent-config:/config
       - ${ROOT_DIR}/data/torrents:/data/torrents
-    ports:
-      - "8080:8080"
-      - "6881:6881"
-      - "6881:6881/udp"
     restart: unless-stopped
 
   sabnzbd:
@@ -206,7 +201,22 @@ services:
     ports:
       - "8081:8080"
     restart: unless-stopped
-  
+
+  gluetun:
+    image: qmcgaw/gluetun
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - VPN_SERVICE_PROVIDER=surfshark
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=GOCD8S1t+4vHUQqB66EmgMjLLjP9+llaoDNF2xY8Lk4=
+      - WIREGUARD_ADDRESSES=10.14.0.2/16
+      - SERVER_COUNTRIES=Netherlands
+    ports:
+      - "8080:8080"
+      - "6881:6881"
+      - "6881:6881/udp"
+
   # container updates + health
   watchtower:
     image: containrrr/watchtower
@@ -227,47 +237,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
   # system monitoring
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: prometheus
-    environment:
-      - PUID=${PROMETHEUS_UID}
-      - PUID=${MEDIACENTER_GID}
-      - TZ=${TIMEZONE}
-      - UMASK=002
-    volumes:
-      - ${ROOT_DIR}/config/prometheus-config:/prometheus
-    ports:
-      - 9090:9090
-    restart: unless-stopped
-    
-  node-exporter:
-    image: quay.io/prometheus/node-exporter:latest
-    container_name: node_exporter
-    network_mode: host
-    environment:
-      - PUID=${NODE_UID}
-      - PGID=${MEDIACENTER_GID}
-      - TZ=${TIMEZONE}
-      - UMASK=002
-    volumes:
-        - /:/host:ro,rslave
-    ports:
-      - 9191:9090
-    restart: unless-stopped
 
-  grafana:
-    image: grafana/grafana:latest
-    container_name: grafana
-    environment:
-      - PUID=${GRAFANA_UID}
-      - PGID=${MEDIACENTER_GID}
-      - TZ=${TIMEZONE}
-      - UMASK=002
-    ports:
-      - 3000:3000
-    restart: unless-stopped
-    
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
@@ -279,6 +249,20 @@ services:
     ports:
       - 3000:3000
     volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
       - ${ROOT_DIR}/config/homepage-config:/config
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped
+    
+  dockerproxy:
+    image: ghcr.io/tecnativa/docker-socket-proxy:latest
+    container_name: dockerproxy
+    environment:
+      - CONTAINERS=1 # Allow access to viewing containers
+      - SERVICES=1 # Allow access to viewing services (necessary when using Docker Swarm)
+      - TASKS=1 # Allow access to viewing tasks (necessary when using Docker Swarm)
+      - POST=0 # Disallow any POST operations (effectively read-only)
+    ports:
+      - 10.0.0.87:2375:2375
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro # Mounted as read-only
     restart: unless-stopped
